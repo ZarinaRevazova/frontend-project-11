@@ -20,13 +20,13 @@ const validateURL = async (url) => {
 
 // основная логика с обработчиком
 const app = async () => {
-    //const form = document.querySelector('.rss-form');
+    const form = document.querySelector('.rss-form');
     const urlInput = document.querySelector('#url-input');
-    const button = document.querySelector('button[type="submit"]');
+    //const button = document.querySelector('button[type="submit"]');
     //const feedback = document.querySelector('.feedback');
     
     // обработчик 
-    button.addEventListener('submit', async (event) => {
+    form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         // проверяю валидность введенного url и обновляю состояние
@@ -53,7 +53,6 @@ const app = async () => {
         urlInput.value = '';
         urlInput.focus();
     });
-
 };
 
 export default app;

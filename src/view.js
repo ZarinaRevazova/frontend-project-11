@@ -33,12 +33,12 @@ const render = async(state) => {
         feedback.classList.add('text-danger');
     }  
     if (state.stateProcess.process === 'errorDouble') {
-        button.disabled = true;
+        button.disabled = false;
         urlInput.classList.add('is-invalid');
         feedback.textContent = 'RSS уже существует';
         feedback.classList.add('text-danger');
     }
-    
+
 };
 
 export default render;
