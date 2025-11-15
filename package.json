@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "[![Actions Status](https://github.com/ZarinaRevazova/frontend-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/ZarinaRevazova/frontend-project-11/actions)",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "start": "vite",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -22,6 +22,9 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.8"
+    "bootstrap": "^5.3.8",
+    "i18next": "^25.6.2",
+    "on-change": "^6.0.1",
+    "yup": "^1.7.1"
   }
 }
