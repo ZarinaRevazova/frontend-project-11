@@ -6,8 +6,8 @@ const state = {
     url: '',
     savedURLs: [],
     stateProcess: {
-        process: 'filling', //'filling', 'valid', 'errorInvalid', 'errorDouble' 
-        error: null,
+        process: 'filling', // 'filling', 'success', 'error'
+        errorCode: null, // 
     } 
 };
 

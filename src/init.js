@@ -1,6 +1,16 @@
 import * as yup from 'yup';
+import i18next from 'i18next';
 import render from './view.js';
 import watcherState from './state.js';
+import resources from './locales/index.js';
+import { ERROR_CODES, ERROR_MESSAGES } from './errors.js';
+
+
+/*yup.setLocale({
+    string: {
+        url: 'url must be a valid url',
+    },
+});*/
 
 // создаю шаблон-схему валидации
 const schema = yup.object().shape({
@@ -10,16 +20,23 @@ const schema = yup.object().shape({
 
 // функция проверки валидности введенного url
 const validateURL = async (url) => {
-    try {
-        await schema.validate({ website: url });
-        return true;
-    } catch (error) {
-        return false;
-    }
+  try {
+    await schema.validate({ website: url });
+    return { valid: true, code: ERROR_CODES.SUCCESS };
+  } catch (error) {
+    return { valid: false, code: ERROR_CODES.INVALID_URL };
+  }
 };
 
 // основная логика с обработчиком
 const app = async () => {
+    // инициализирую библиотеку i18next
+    const i18nextInstance = i18next.createInstance();
+    await i18nextInstance.init({
+      lng: 'ru',
+      debug: true,
+      resources,
+    });
     const form = document.querySelector('.rss-form');
     const urlInput = document.querySelector('#url-input');
     //const button = document.querySelector('button[type="submit"]');
@@ -31,25 +48,24 @@ const app = async () => {
 
         // проверяю валидность введенного url и обновляю состояние
         const currentURL = urlInput.value.trim();
-        const isValid = await validateURL(currentURL);
         watcherState.url = currentURL;
         
-        if (isValid) {
-            // проверяю является ли введенный url дубликатом
-            const existingURL = watcherState.savedURLs.find((url) => url === currentURL);
-            if (existingURL) {
-                watcherState.stateProcess.process = 'errorDouble';
-            } else {
-                watcherState.stateProcess.process = 'valid';
-                watcherState.savedURLs.push(currentURL);
-            }
+        const { valid, code } = await validateURL(currentURL);
+        if (!valid) {
+            watcherState.stateProcess.process = 'error';
+            watcherState.stateProcess.errorCode = code;
+        } else if (watcherState.savedURLs.includes(currentURL)) {
+            watcherState.stateProcess.process = 'error';
+            watcherState.stateProcess.errorCode = ERROR_CODES.DUPLICATE_URL;
         } else {
-            watcherState.stateProcess.process = 'errorInvalid';
+         watcherState.savedURLs.push(currentURL);
+         watcherState.stateProcess.process = 'success';
+         watcherState.stateProcess.errorCode = ERROR_CODES.SUCCESS;
         }
         
         // отображаю состояние
         // очищаю инпут, ставлю фокус
-        await render(watcherState);
+        await render(watcherState, i18nextInstance);
         urlInput.value = '';
         urlInput.focus();
     });

@@ -1,4 +1,6 @@
-const render = async(state) => {
+import { ERROR_CODES, ERROR_MESSAGES } from "./errors.js";
+
+const render = async(state, i18next) => {
     const urlInput = document.querySelector('#url-input');
     const button = document.querySelector('button[type="submit"]');
     const feedback = document.querySelector('.feedback');
@@ -18,27 +20,21 @@ const render = async(state) => {
     if (state.stateProcess.process === 'filling') {
         button.disabled = false;
     }
-    if (state.stateProcess.process === 'valid') {
+    if (state.stateProcess.process === 'success') {
         button.disabled = false;
         urlInput.value = '';
         urlInput.classList.add('is-valid');
         urlInput.focus();
-        feedback.textContent = 'RSS успешно загружен';
+        feedback.textContent = i18next.t(ERROR_MESSAGES[ERROR_CODES.SUCCESS]);
         feedback.classList.add('text-success');
     } 
-    if (state.stateProcess.process === 'errorInvalid') {
+    if (state.stateProcess.process === 'error') {
         button.disabled = false;
         urlInput.classList.add('is-invalid');
-        feedback.textContent = 'Ссылка должна быть валидным URL';
-        feedback.classList.add('text-danger');
-    }  
-    if (state.stateProcess.process === 'errorDouble') {
-        button.disabled = false;
-        urlInput.classList.add('is-invalid');
-        feedback.textContent = 'RSS уже существует';
+        const messageKey = i18next.t(ERROR_MESSAGES[state.stateProcess.errorCode]);
+        feedback.textContent = i18next.t(messageKey);
         feedback.classList.add('text-danger');
     }
-
 };
 
 export default render;
