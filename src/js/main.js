@@ -1,8 +1,6 @@
 import '../scss/styles.scss';
+import * as bootstrap from 'bootstrap';
 
 import app from '../init.js';
-
-// Import all of Bootstrap's JS
-import * as bootstrap from 'bootstrap'
 
 app();

@@ -1,22 +1,23 @@
 import * as yup from 'yup';
 import i18next from 'i18next';
 import render from './view.js';
-import watcherState from './state.js';
+import watcherState, { createFeedsState, createPostsState } from './state.js';
 import resources from './locales/index.js';
-import { ERROR_CODES, ERROR_MESSAGES } from './errors.js';
+import { ERROR_CODES } from './errors.js';
+import fetchRssFeed from './fetchRssStream.js';
+import parseRssString from './parser.js';
 
-
-/*yup.setLocale({
+/* yup.setLocale({
     string: {
         url: 'url must be a valid url',
     },
-});*/
+}); */
 
 // создаю шаблон-схему валидации
 const schema = yup.object().shape({
-  website: yup.string().url().required('url must be a valid url').trim().lowercase(),
+  website: yup.string().url().required('url must be a valid url').trim()
+    .lowercase(),
 });
-
 
 // функция проверки валидности введенного url
 const validateURL = async (url) => {
@@ -30,45 +31,66 @@ const validateURL = async (url) => {
 
 // основная логика с обработчиком
 const app = async () => {
-    // инициализирую библиотеку i18next
-    const i18nextInstance = i18next.createInstance();
-    await i18nextInstance.init({
-      lng: 'ru',
-      debug: true,
-      resources,
-    });
-    const form = document.querySelector('.rss-form');
-    const urlInput = document.querySelector('#url-input');
-    //const button = document.querySelector('button[type="submit"]');
-    //const feedback = document.querySelector('.feedback');
-    
-    // обработчик 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
+  // инициализирую библиотеку i18next
+  const i18nextInstance = i18next.createInstance();
+  await i18nextInstance.init({
+    lng: 'ru',
+    debug: true,
+    resources,
+  });
+  const form = document.querySelector('.rss-form');
+  const urlInput = document.querySelector('#url-input');
+  // const button = document.querySelector('button[type="submit"]');
+  // const feedback = document.querySelector('.feedback');
 
-        // проверяю валидность введенного url и обновляю состояние
-        const currentURL = urlInput.value.trim();
-        watcherState.url = currentURL;
-        
-        const { valid, code } = await validateURL(currentURL);
-        if (!valid) {
-            watcherState.stateProcess.process = 'error';
-            watcherState.stateProcess.errorCode = code;
-        } else if (watcherState.savedURLs.includes(currentURL)) {
-            watcherState.stateProcess.process = 'error';
-            watcherState.stateProcess.errorCode = ERROR_CODES.DUPLICATE_URL;
-        } else {
-         watcherState.savedURLs.push(currentURL);
-         watcherState.stateProcess.process = 'success';
-         watcherState.stateProcess.errorCode = ERROR_CODES.SUCCESS;
+  // обработчик
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    // проверяю валидность введенного url и обновляю состояние
+    const currentURL = urlInput.value.trim();
+    watcherState.url = currentURL;
+
+    await validateURL(currentURL).then(async ({ valid, code }) => {
+      if (!valid) {
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = code; // если нurlне валиден
+      } else if (watcherState.savedURLs.includes(currentURL)) {
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = ERROR_CODES.DUPLICATE_URL; // если url дублируется
+      } else {
+        // скачиваю поток
+        const xmlString = fetchRssFeed(currentURL);
+        // парсю полученные данные в объекте
+        const { feedTitle, feedDescription, postContent } = parseRssString(xmlString);
+        // проверяю наличие фидов в состоянии
+        const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
+
+        const currentFeed = existingFeed
+          ? { ...existingFeed, title: feedTitle, description: feedDescription }
+          : createFeedsState(currentURL, feedTitle, feedDescription);
+
+        if (!existingFeed) {
+          // добавляю данные фида в состояние
+          watcherState.feeds = [...watcherState.feeds, currentFeed];
+          watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
         }
-        
-        // отображаю состояние
-        // очищаю инпут, ставлю фокус
-        await render(watcherState, i18nextInstance);
-        urlInput.value = '';
-        urlInput.focus();
+
+        // добавляю данные поста в состояние
+        const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post));
+        watcherState.posts = [...watcherState.posts, ...newPosts];
+
+        watcherState.savedURLs.push(currentURL);
+        watcherState.stateProcess.process = 'success';
+        watcherState.stateProcess.errorCode = ERROR_CODES.SUCCESS;
+      }
     });
+    // отображаю состояние
+    // очищаю инпут, ставлю фокус
+    await render(watcherState, i18nextInstance);
+    urlInput.value = '';
+    urlInput.focus();
+  });
 };
 
 export default app;
