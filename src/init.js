@@ -51,40 +51,46 @@ const app = async () => {
     const currentURL = urlInput.value.trim();
     watcherState.url = currentURL;
 
-    await validateURL(currentURL).then(async ({ valid, code }) => {
+    try {
+      const { valid, code } = await validateURL(currentURL);
       if (!valid) {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = code; // если нurlне валиден
-      } else if (watcherState.savedURLs.includes(currentURL)) {
+        return;
+      }
+      if (watcherState.savedURLs.includes(currentURL)) {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = ERROR_CODES.DUPLICATE_URL; // если url дублируется
-      } else {
-        // скачиваю поток
-        const xmlString = fetchRssFeed(currentURL);
-        // парсю полученные данные в объекте
-        const { feedTitle, feedDescription, postContent } = parseRssString(xmlString);
-        // проверяю наличие фидов в состоянии
-        const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
-
-        const currentFeed = existingFeed
-          ? { ...existingFeed, title: feedTitle, description: feedDescription }
-          : createFeedsState(currentURL, feedTitle, feedDescription);
-
-        if (!existingFeed) {
-          // добавляю данные фида в состояние
-          watcherState.feeds = [...watcherState.feeds, currentFeed];
-          watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
-        }
-
-        // добавляю данные поста в состояние
-        const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post));
-        watcherState.posts = [...watcherState.posts, ...newPosts];
-
-        watcherState.savedURLs.push(currentURL);
-        watcherState.stateProcess.process = 'success';
-        watcherState.stateProcess.errorCode = ERROR_CODES.SUCCESS;
+        return;
       }
-    });
+      // скачиваю поток
+      const xmlString = await fetchRssFeed(currentURL);
+      // парсю полученные данные в объекте
+      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString);
+      // проверяю наличие фидов в состоянии
+      const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
+
+      const currentFeed = existingFeed
+        ? { ...existingFeed, title: feedTitle, description: feedDescription }
+        : createFeedsState(currentURL, feedTitle, feedDescription);
+
+      if (!existingFeed) {
+        // добавляю данные фида в состояние
+        watcherState.feeds = [...watcherState.feeds, currentFeed];
+        watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
+      }
+
+      // добавляю данные поста в состояние
+      const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post.title, post.link, post.description));
+      watcherState.posts = [...watcherState.posts, ...newPosts];
+
+      watcherState.savedURLs.push(currentURL);
+      watcherState.stateProcess.process = 'success';
+      watcherState.stateProcess.errorCode = ERROR_CODES.SUCCESS;
+    } catch (error) {
+      watcherState.stateProcess.process = 'error';
+      watcherState.stateProcess.errorCode = ERROR_CODES.NETWORK_ERROR;
+    }
     // отображаю состояние
     // очищаю инпут, ставлю фокус
     await render(watcherState, i18nextInstance);
