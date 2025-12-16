@@ -34,7 +34,7 @@ const render = async (state, i18next) => {
     feeds.innerHTML = '';
     posts.innerHTML = '';
 
-    state.feeds.forEach((feed) => {
+    /* state.feeds.forEach((feed) => {
       const divBorder = document.createElement('div');
       const divBody = document.createElement('div');
       const h2 = document.createElement('h2');
@@ -69,12 +69,15 @@ const render = async (state, i18next) => {
       //
       //
       //
-    });
+    }); */
   }
+
   if (state.stateProcess.process === 'error') {
     button.disabled = false;
     urlInput.classList.add('is-invalid');
-    const messageKey = i18next.t(ERROR_MESSAGES[state.stateProcess.errorCode]);
+    // в зависимости от значения ошибки (errorCode в состоянии), выводим соответствующее сообщение
+    const errorMessage = ERROR_MESSAGES[state.stateProcess.errorCode];
+    const messageKey = i18next.t(errorMessage);
     feedback.textContent = i18next.t(messageKey);
     feedback.classList.add('text-danger');
   }

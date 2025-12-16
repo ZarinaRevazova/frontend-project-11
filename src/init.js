@@ -64,9 +64,9 @@ const app = async () => {
         return;
       }
       // скачиваю поток
-      const xmlString = await fetchRssFeed(currentURL);
+      const xmlString = await fetchRssFeed(currentURL, watcherState, ERROR_CODES, 2000);
       // парсю полученные данные в объекте
-      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString);
+      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString, watcherState, ERROR_CODES);
       // проверяю наличие фидов в состоянии
       const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
 
