@@ -55,20 +55,27 @@ const app = async () => {
       const { valid, code } = await validateURL(currentURL);
       if (!valid) {
         watcherState.stateProcess.process = 'error';
-        watcherState.stateProcess.errorCode = code; // если нurlне валиден
+        watcherState.stateProcess.errorCode = code; // если url не валиден
+        await render(watcherState, i18nextInstance);
         return;
       }
       if (watcherState.savedURLs.includes(currentURL)) {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = ERROR_CODES.DUPLICATE_URL; // если url дублируется
+        await render(watcherState, i18nextInstance);
         return;
       }
       // скачиваю поток
-      const xmlString = await fetchRssFeed(currentURL, watcherState, ERROR_CODES, 2000);
+      const xmlString = await fetchRssFeed(currentURL, watcherState, ERROR_CODES);
       // парсю полученные данные в объекте
-      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString, watcherState, ERROR_CODES);
+      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString);
+
+      if (!feedTitle || !postContent.length) { // Базовая проверка
+        throw new Error('Невалидный RSS');
+      }
+
       // проверяю наличие фидов в состоянии
-      const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
+      /* const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
 
       const currentFeed = existingFeed
         ? { ...existingFeed, title: feedTitle, description: feedDescription }
@@ -82,14 +89,19 @@ const app = async () => {
 
       // добавляю данные поста в состояние
       const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post.title, post.link, post.description));
-      watcherState.posts = [...watcherState.posts, ...newPosts];
+      watcherState.posts = [...watcherState.posts, ...newPosts]; */
 
       watcherState.savedURLs.push(currentURL);
       watcherState.stateProcess.process = 'success';
       watcherState.stateProcess.errorCode = ERROR_CODES.SUCCESS;
     } catch (error) {
-      watcherState.stateProcess.process = 'error';
-      watcherState.stateProcess.errorCode = ERROR_CODES.NETWORK_ERROR;
+      if (error.message === 'Невалидный RSS') {
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = ERROR_CODES.INVALID_RSS;
+      } else {
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = ERROR_CODES.NETWORK_ERROR;
+      }
     }
     // отображаю состояние
     // очищаю инпут, ставлю фокус

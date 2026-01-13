@@ -7,21 +7,17 @@ import axios from 'axios';
 // (тогда поток скачивается без CORS-ограничений) ===>
 // Получаем JSON-объект, где xml-строка хранится в contents (в  data.contents) ===>
 // Эта xml-строка и будет потом входным параметром нашей парсинг-функции
-const fetchRssFeed = async (rssUrl, watcherState, errorCode, timeout = 1000) => {
+const fetchRssFeed = async (rssUrl, watcherState, errorCode, timeout = 5000) => {
   try {
-    const response = await axios.get('https://api.allorigins.win/get', {
-      params: {
-        url: rssUrl,
-        cache: 0, // отключаю кэширование
-      },
+    const response = await axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(rssUrl)}`, {
       timeout,
     });
 
-    const { contents } = response.data;
-
-    /* if (response.status !== 200) {
+    if (response.status !== 200) {
       throw new Error(`Прокси вернул HTTP ${response.status}`);
-    } */
+    }
+
+    const { contents } = response.data;
 
     /* if (data.status !== 200) {
       watcherState.stateProcess = {
@@ -45,9 +41,9 @@ const fetchRssFeed = async (rssUrl, watcherState, errorCode, timeout = 1000) => 
     watcherState.stateProcess = {
       ...watcherState.stateProcess,
       process: 'error',
-      errorCode: errorCode.NETWORK_ERROR,
+      errorCode: error.messege.includes('HTTP') ? errorCode.NETWORK_ERROR : errorCode.INVALID_RSS,
     };
-    console.error('fetchRssFeed ошибка:', error.message);
+    // console.error('fetchRssFeed ошибка:', error.message);
     throw error;
   }
 };

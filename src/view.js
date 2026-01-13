@@ -1,4 +1,5 @@
 import { ERROR_CODES, ERROR_MESSAGES } from './errors.js';
+import watcherState from './state.js';
 
 const render = async (state, i18next) => {
   const urlInput = document.querySelector('#url-input');
@@ -20,9 +21,7 @@ const render = async (state, i18next) => {
 
   // явно выделяю состояние и в зависимости от него меняется отображение (инпут(границы),
   // кнопка и фидбек с изменением цвета шрифта)
-  if (state.stateProcess.process === 'filling') {
-    button.disabled = false;
-  }
+
   if (state.stateProcess.process === 'success') {
     button.disabled = false;
     urlInput.value = '';
@@ -31,8 +30,8 @@ const render = async (state, i18next) => {
     feedback.textContent = i18next.t(ERROR_MESSAGES[ERROR_CODES.SUCCESS]);
     feedback.classList.add('text-success');
 
-    feeds.innerHTML = '';
-    posts.innerHTML = '';
+    // feeds.innerHTML = '';
+    // posts.innerHTML = '';
 
     /* state.feeds.forEach((feed) => {
       const divBorder = document.createElement('div');
@@ -70,16 +69,16 @@ const render = async (state, i18next) => {
       //
       //
     }); */
-  }
-
-  if (state.stateProcess.process === 'error') {
+  } else if (state.stateProcess.process === 'error') {
     button.disabled = false;
     urlInput.classList.add('is-invalid');
     // в зависимости от значения ошибки (errorCode в состоянии), выводим соответствующее сообщение
-    const errorMessage = ERROR_MESSAGES[state.stateProcess.errorCode];
+    const errorMessage = ERROR_MESSAGES[watcherState.stateProcess.errorCode];
     const messageKey = i18next.t(errorMessage);
-    feedback.textContent = i18next.t(messageKey);
+    feedback.textContent = messageKey;
     feedback.classList.add('text-danger');
+  } else {
+    button.disabled = false;
   }
 };
 
