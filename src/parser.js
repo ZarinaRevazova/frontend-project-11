@@ -8,7 +8,7 @@
 // (feedTitle, feedDescription, postContent),
 // чтобы потом отобразить фиды и посты в интерфейсе
 
-const parseRssString = (xmlString, watcherState, ERROR_CODES) => {
+const parseRssString = (xmlString) => {
   try {
     const parser = new DOMParser();
     const parsedDoc = parser.parseFromString(xmlString, 'application/xml');
@@ -20,7 +20,7 @@ const parseRssString = (xmlString, watcherState, ERROR_CODES) => {
         process: 'error',
         errorCode: ERROR_CODES.INVALID_RSS,
       };
-      throw new Error(' Invalid RSS');
+      throw new Error('Invalid RSS');
     }
 
     const feedTitle = parsedDoc.querySelector('channel > title').textContent;

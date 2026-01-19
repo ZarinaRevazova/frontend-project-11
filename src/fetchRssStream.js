@@ -41,7 +41,7 @@ const fetchRssFeed = async (rssUrl, watcherState, errorCode, timeout = 5000) => 
     watcherState.stateProcess = {
       ...watcherState.stateProcess,
       process: 'error',
-      errorCode: error.messege.includes('HTTP') ? errorCode.NETWORK_ERROR : errorCode.INVALID_RSS,
+      errorCode: error.message.includes('HTTP') ? errorCode.NETWORK_ERROR : errorCode.INVALID_RSS,
     };
     // console.error('fetchRssFeed ошибка:', error.message);
     throw error;

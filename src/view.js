@@ -30,10 +30,10 @@ const render = async (state, i18next) => {
     feedback.textContent = i18next.t(ERROR_MESSAGES[ERROR_CODES.SUCCESS]);
     feedback.classList.add('text-success');
 
-    // feeds.innerHTML = '';
+    feeds.innerHTML = '';
     // posts.innerHTML = '';
 
-    /* state.feeds.forEach((feed) => {
+    state.feeds.forEach((feed) => {
       const divBorder = document.createElement('div');
       const divBody = document.createElement('div');
       const h2 = document.createElement('h2');
@@ -64,7 +64,7 @@ const render = async (state, i18next) => {
       feeds.appendChild(divBorder);
     });
 
-    state.posts.forEach((post) => {
+    /* state.posts.forEach((post) => {
       //
       //
       //

@@ -71,11 +71,11 @@ const app = async () => {
       const { feedTitle, feedDescription, postContent } = parseRssString(xmlString);
 
       if (!feedTitle || !postContent.length) { // Базовая проверка
-        throw new Error('Невалидный RSS');
+        throw new Error('Invalid RSS');
       }
 
       // проверяю наличие фидов в состоянии
-      /* const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
+      const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
 
       const currentFeed = existingFeed
         ? { ...existingFeed, title: feedTitle, description: feedDescription }
@@ -84,18 +84,18 @@ const app = async () => {
       if (!existingFeed) {
         // добавляю данные фида в состояние
         watcherState.feeds = [...watcherState.feeds, currentFeed];
-        watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
+        // watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
       }
 
       // добавляю данные поста в состояние
-      const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post.title, post.link, post.description));
+      /* const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post.title, post.link, post.description));
       watcherState.posts = [...watcherState.posts, ...newPosts]; */
 
       watcherState.savedURLs.push(currentURL);
       watcherState.stateProcess.process = 'success';
       watcherState.stateProcess.errorCode = ERROR_CODES.SUCCESS;
     } catch (error) {
-      if (error.message === 'Невалидный RSS') {
+      if (error.message === 'Invalid RSS') {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = ERROR_CODES.INVALID_RSS;
       } else {
