@@ -1,5 +1,6 @@
 import { ERROR_CODES, ERROR_MESSAGES } from './errors.js';
-import watcherState from './state.js';
+// import watcherState from './state.js';
+import { feedsBlock, postsBlock } from './viewUtils.js';
 
 const render = async (state, i18next) => {
   const urlInput = document.querySelector('#url-input');
@@ -31,38 +32,10 @@ const render = async (state, i18next) => {
     feedback.classList.add('text-success');
 
     feeds.innerHTML = '';
-    // posts.innerHTML = '';
+    posts.innerHTML = '';
 
-    state.feeds.forEach((feed) => {
-      const divBorder = document.createElement('div');
-      const divBody = document.createElement('div');
-      const h2 = document.createElement('h2');
-      const ul = document.createElement('ul');
-      const li = document.createElement('li');
-      const h3 = document.createElement('h3');
-      const p = document.createElement('p');
-
-      divBorder.classList.add('card', 'border-0');
-      divBody.classList.add('card-body');
-      h2.classList.add('card-title', 'h4');
-      ul.classList.add('list-group', 'border-0', 'rounded-0');
-      li.classList.add('list-group-item', 'border-0', 'border-end-0');
-      h3.classList.add('h6', 'm-0');
-      p.classList.add('m-0', 'small', 'text-black-50');
-
-      divBorder.appendChild(divBody);
-      divBody.appendChild(h2);
-      divBody.appendChild(ul);
-      ul.appendChild(li);
-      li.appendChild(h3);
-      li.appendChild(p);
-
-      h2.textContent = 'Фиды';
-      h3.textContent = feed.title;
-      p.textContent = feed.description;
-
-      feeds.appendChild(divBorder);
-    });
+    feedsBlock(state, feeds);
+    postsBlock(state, posts);
 
     /* state.posts.forEach((post) => {
       //
@@ -73,7 +46,7 @@ const render = async (state, i18next) => {
     button.disabled = false;
     urlInput.classList.add('is-invalid');
     // в зависимости от значения ошибки (errorCode в состоянии), выводим соответствующее сообщение
-    const errorMessage = ERROR_MESSAGES[watcherState.stateProcess.errorCode];
+    const errorMessage = ERROR_MESSAGES[state.stateProcess.errorCode];
     const messageKey = i18next.t(errorMessage);
     feedback.textContent = messageKey;
     feedback.classList.add('text-danger');

@@ -8,17 +8,17 @@
 // (feedTitle, feedDescription, postContent),
 // чтобы потом отобразить фиды и посты в интерфейсе
 
-const parseRssString = (xmlString) => {
+const parseRssString = (xmlString, state, errorCode) => {
   try {
     const parser = new DOMParser();
     const parsedDoc = parser.parseFromString(xmlString, 'application/xml');
 
     const parserError = parsedDoc.querySelector('parsererror');
     if (parserError) {
-      watcherState.stateProcess = {
-        ...watcherState.stateProcess,
+      state.stateProcess = {
+        ...state.stateProcess,
         process: 'error',
-        errorCode: ERROR_CODES.INVALID_RSS,
+        errorCode: errorCode.INVALID_RSS,
       };
       throw new Error('Invalid RSS');
     }
@@ -35,10 +35,10 @@ const parseRssString = (xmlString) => {
     });
     return { feedTitle, feedDescription, postContent }; // объект с данными для фидов
   } catch (error) {
-    watcherState.stateProcess = {
-      ...watcherState.stateProcess,
+    state.stateProcess = {
+      ...state.stateProcess,
       process: 'error',
-      errorCode: ERROR_CODES.INVALID_RSS,
+      errorCode: errorCode.INVALID_RSS,
     };
     throw error;
   }
