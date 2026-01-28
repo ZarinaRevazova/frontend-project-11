@@ -5,7 +5,9 @@ import render from './view.js';
 // определяю начальное состояние
 const state = {
   url: '',
-  savedURLs: [],
+  savedURLs: [], // нужно для проверки дубликатов
+  // trackedFeeds: [], // новые: список { url, lastCheckTime, lastPostCount }
+  // isUpdatingFeeds: false,
   stateProcess: {
     process: 'filling', // 'filling', 'success', 'error'
     errorCode: null, // ERROR_CODES

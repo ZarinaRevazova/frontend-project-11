@@ -4,8 +4,9 @@ import render from './view.js';
 import state, { createFeedsState, createPostsState } from './state.js';
 import resources from './locales/index.js';
 import { ERROR_CODES } from './errors.js';
-import fetchRssFeed from './fetchRssStream.js';
+import { fetchRssFeed, updateFeeds } from './fetchRssStream.js';
 import parseRssString from './parser.js';
+// import addTrackedFeed from './updates.js';
 
 /* yup.setLocale({
     string: {
@@ -89,6 +90,8 @@ const app = async () => {
         // watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
       }
 
+      // addTrackedFeed(currentURL);
+
       // добавляю данные поста в состояние
       // eslint-disable-next-line max-len
       const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post.title, post.link, post.description));
@@ -97,6 +100,8 @@ const app = async () => {
       state.savedURLs.push(currentURL);
       state.stateProcess.process = 'success';
       state.stateProcess.errorCode = ERROR_CODES.SUCCESS;
+
+      // await updateFeeds(state, ERROR_CODES);
     } catch (error) {
       if (error.message === 'Invalid RSS') {
         state.stateProcess.process = 'error';
@@ -108,6 +113,9 @@ const app = async () => {
     }
     // отображаю состояние
     // очищаю инпут, ставлю фокус
+    if (state.feeds.length > 0) {
+      await updateFeeds(state, ERROR_CODES);
+    }
     await render(state, i18nextInstance);
     urlInput.value = '';
     urlInput.focus();
