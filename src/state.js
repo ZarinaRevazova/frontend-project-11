@@ -1,5 +1,6 @@
 import onChange from 'on-change';
 import uniqid from 'uniqid';
+import i18next from 'i18next';
 import render from './view.js';
 
 // определяю начальное состояние
@@ -36,7 +37,7 @@ export const createPostsState = (feedId, title, link, description) => ({
 // создаю вотчер на объект state --> далее в input.js отработаю логику:
 // "меняется состояние --> вотчер отслеживает --> автоматически меняется отображение"
 const watcherState = onChange(state, () => {
-  render(watcherState);
+  render(watcherState, i18next);
 });
 
 export default watcherState;

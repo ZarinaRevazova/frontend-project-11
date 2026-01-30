@@ -6,6 +6,7 @@ import resources from './locales/index.js';
 import { ERROR_CODES } from './errors.js';
 import { fetchRssFeed, updateFeeds } from './fetchRssStream.js';
 import parseRssString from './parser.js';
+import watcherState from './state.js';
 // import addTrackedFeed from './updates.js';
 
 /* yup.setLocale({
@@ -50,6 +51,7 @@ const app = async () => {
 
     // проверяю валидность введенного url и обновляю состояние
     const currentURL = urlInput.value.trim();
+    // const initialState = { ...state };
     state.url = currentURL;
 
     try {
@@ -113,13 +115,13 @@ const app = async () => {
     }
     // отображаю состояние
     // очищаю инпут, ставлю фокус
-    if (state.feeds.length > 0) {
-      await updateFeeds(state, ERROR_CODES);
-    }
+
     await render(state, i18nextInstance);
     urlInput.value = '';
     urlInput.focus();
   });
+  await updateFeeds(state, watcherState, ERROR_CODES);
+  await render(state, i18nextInstance);
 };
 
 export default app;

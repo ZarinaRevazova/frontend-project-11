@@ -24,15 +24,6 @@ export const fetchRssFeed = async (rssUrl, state, errorCode, timeout = 5000) => 
 
     const { contents } = response.data;
 
-    /* if (data.status !== 200) {
-      watcherState.stateProcess = {
-        ...watcherState.stateProcess,
-        process: 'error',
-        errorCode: errorCode.NETWORK_ERROR, // например, 404 от источника
-      };
-      throw new Error(`Исходный сервер: HTTP ${data.status}`);
-    } */
-
     if (!contents) {
       state.stateProcess = {
         ...state.stateProcess,
@@ -52,7 +43,34 @@ export const fetchRssFeed = async (rssUrl, state, errorCode, timeout = 5000) => 
     throw error;
   }
 };
-export const updateFeeds = async (state, errorCode) => {
+export const updateFeeds = (state, watcherState, errorCode) => {
+  const existingFeedsPromises = state.feeds.map((feed) => fetchRssFeed(feed.link, state, errorCode)
+    .then((xmlString) => {
+      const { postContent } = parseRssString(xmlString, state, errorCode);
+      const newPosts = postContent.map((post) => ({
+        id: uniqid(),
+        feedId: feed.id,
+        ...post,
+      }));
+      const existingPostsURLs = new Set(state.posts.map((post) => post.link));
+      const postsToAdd = newPosts.filter((post) => !existingPostsURLs.has(post.link));
+      if (postsToAdd.length > 0) {
+        state.posts = [...postsToAdd, ...state.posts];
+        watcherState.posts = [...state.posts];
+      }
+    })
+    .catch((error) => {
+      console.error('updateFeeds ошибка:', error);
+    }));
+
+  Promise.all(existingFeedsPromises).then(() => {
+    setTimeout(() => {
+      updateFeeds(state, watcherState, errorCode);
+    }, 5000);
+  });
+};
+
+/*
   if (state.feeds.length === 0) return;// если нет фидов, то ничего не делаем
 
   const existingFeedsPromises = state.feeds.map(async (feed) => {
@@ -75,9 +93,9 @@ export const updateFeeds = async (state, errorCode) => {
     } catch (error) {
       console.error('updateFeeds ошибка:', error);
     }
-  });
+  }); */
 
-  /* await Promise.all(existingFeedsPromises)
+/* await Promise.all(existingFeedsPromises)
     .catch((ovError) => console.error('updateFeeds ошибка:', ovError))
     .finally(() => {
       state.isUpdatingFeeds = false;
@@ -88,7 +106,7 @@ export const updateFeeds = async (state, errorCode) => {
       updateFeeds(state, errorCode);
     }
   }, 5000); */
-  /* await Promise.all(existingFeedsPromises)
+/* await Promise.all(existingFeedsPromises)
     .catch((ovError) => console.error('updateFeeds ошибка:', ovError))
     .finally(() => {
       state.isUpdatingFeeds = false;
@@ -96,8 +114,16 @@ export const updateFeeds = async (state, errorCode) => {
 
   setTimeout(() => updateFeeds(state, errorCode), 5000); */
 
-  await Promise.all(existingFeedsPromises).then(() => {
+/* await Promise.all(existingFeedsPromises).then(() => {
   }).finally(() => {
     setTimeout(() => updateFeeds(state, errorCode), 5000);
-  });
-};
+  }); */
+
+/* if (data.status !== 200) {
+      watcherState.stateProcess = {
+        ...watcherState.stateProcess,
+        process: 'error',
+        errorCode: errorCode.NETWORK_ERROR, // например, 404 от источника
+      };
+      throw new Error(`Исходный сервер: HTTP ${data.status}`);
+    } */
