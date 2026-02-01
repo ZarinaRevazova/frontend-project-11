@@ -1,12 +1,12 @@
 import * as yup from 'yup';
 import i18next from 'i18next';
-import render from './view.js';
+// import render from './view.js';
 import state, { createFeedsState, createPostsState } from './state.js';
 import resources from './locales/index.js';
 import { ERROR_CODES } from './errors.js';
 import { fetchRssFeed, updateFeeds } from './fetchRssStream.js';
 import parseRssString from './parser.js';
-import watcherState from './state.js';
+import watcher from './view.js';
 // import addTrackedFeed from './updates.js';
 
 /* yup.setLocale({
@@ -40,6 +40,9 @@ const app = async () => {
     debug: true,
     resources,
   });
+
+  const watcherState = watcher(state, i18nextInstance);
+
   const form = document.querySelector('.rss-form');
   const urlInput = document.querySelector('#url-input');
   // const button = document.querySelector('button[type="submit"]');
@@ -48,38 +51,38 @@ const app = async () => {
   // обработчик
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    // watcherState.stateProcess = { ...watcherState.stateProcess.process, process: 'processing' };
 
     // проверяю валидность введенного url и обновляю состояние
     const currentURL = urlInput.value.trim();
     // const initialState = { ...state };
-    state.url = currentURL;
+    watcherState.url = currentURL;
 
     try {
       const { valid, code } = await validateURL(currentURL);
       if (!valid) {
-        state.stateProcess.process = 'error';
-        state.stateProcess.errorCode = code; // если url не валиден
-        await render(state, i18nextInstance);
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = code; // если url не валиден
         return;
       }
-      if (state.savedURLs.includes(currentURL)) {
-        state.stateProcess.process = 'error';
-        state.stateProcess.errorCode = ERROR_CODES.DUPLICATE_URL; // если url дублируется
-        await render(state, i18nextInstance);
+      if (watcherState.savedURLs.includes(currentURL)) {
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = ERROR_CODES.DUPLICATE_URL; // если url дублируется
+        // await render(state, i18nextInstance);
         return;
       }
       // скачиваю поток
-      const xmlString = await fetchRssFeed(currentURL, state, ERROR_CODES);
+      const xmlString = await fetchRssFeed(currentURL, watcherState, ERROR_CODES);
       // парсю полученные данные в объекте
       // eslint-disable-next-line max-len
-      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString, state, ERROR_CODES);
+      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString, watcherState, ERROR_CODES);
 
       if (!feedTitle || !postContent.length) { // Базовая проверка на валидность RSS
         throw new Error('Invalid RSS');
       }
 
       // проверяю наличие фидов в состоянии
-      const existingFeed = state.feeds.find((feed) => feed.link === currentURL);
+      const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
 
       // если фид есть --> обновляю данные, если нет --> создаю новый фид
       const currentFeed = existingFeed
@@ -88,8 +91,8 @@ const app = async () => {
 
       if (!existingFeed) {
         // добавляю данные фида в состояние
-        state.feeds = [...state.feeds, currentFeed];
-        // watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
+        watcherState.feeds = [...watcherState.feeds, currentFeed];
+        watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
       }
 
       // addTrackedFeed(currentURL);
@@ -97,31 +100,31 @@ const app = async () => {
       // добавляю данные поста в состояние
       // eslint-disable-next-line max-len
       const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post.title, post.link, post.description));
-      state.posts = [...state.posts, ...newPosts];
+      watcherState.posts = [...watcherState.posts, ...newPosts];
 
-      state.savedURLs.push(currentURL);
-      state.stateProcess.process = 'success';
-      state.stateProcess.errorCode = ERROR_CODES.SUCCESS;
+      watcherState.savedURLs.push(currentURL);
+      watcherState.stateProcess.process = 'success';
+      watcherState.stateProcess.errorCode = ERROR_CODES.SUCCESS;
 
       // await updateFeeds(state, ERROR_CODES);
     } catch (error) {
       if (error.message === 'Invalid RSS') {
-        state.stateProcess.process = 'error';
-        state.stateProcess.errorCode = ERROR_CODES.INVALID_RSS;
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = ERROR_CODES.INVALID_RSS;
       } else {
-        state.stateProcess.process = 'error';
-        state.stateProcess.errorCode = ERROR_CODES.NETWORK_ERROR;
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = ERROR_CODES.NETWORK_ERROR;
       }
     }
     // отображаю состояние
     // очищаю инпут, ставлю фокус
 
-    await render(state, i18nextInstance);
+    // await render(state, i18nextInstance);
     urlInput.value = '';
     urlInput.focus();
   });
-  await updateFeeds(state, watcherState, ERROR_CODES);
-  await render(state, i18nextInstance);
+  updateFeeds(watcherState, ERROR_CODES);
+  // await render(state, i18nextInstance);
 };
 
 export default app;

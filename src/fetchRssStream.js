@@ -43,7 +43,7 @@ export const fetchRssFeed = async (rssUrl, state, errorCode, timeout = 5000) => 
     throw error;
   }
 };
-export const updateFeeds = (state, watcherState, errorCode) => {
+export const updateFeeds = (state, errorCode) => {
   const existingFeedsPromises = state.feeds.map((feed) => fetchRssFeed(feed.link, state, errorCode)
     .then((xmlString) => {
       const { postContent } = parseRssString(xmlString, state, errorCode);
@@ -56,7 +56,7 @@ export const updateFeeds = (state, watcherState, errorCode) => {
       const postsToAdd = newPosts.filter((post) => !existingPostsURLs.has(post.link));
       if (postsToAdd.length > 0) {
         state.posts = [...postsToAdd, ...state.posts];
-        watcherState.posts = [...state.posts];
+        // watcherState.posts = [...state.posts];
       }
     })
     .catch((error) => {
@@ -65,7 +65,7 @@ export const updateFeeds = (state, watcherState, errorCode) => {
 
   Promise.all(existingFeedsPromises).then(() => {
     setTimeout(() => {
-      updateFeeds(state, watcherState, errorCode);
+      updateFeeds(state, errorCode);
     }, 5000);
   });
 };

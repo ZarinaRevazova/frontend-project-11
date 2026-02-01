@@ -1,8 +1,9 @@
+import onChange from 'on-change';
 import { ERROR_CODES, ERROR_MESSAGES } from './errors.js';
 // import watcherState from './state.js';
 import { feedsBlock, postsBlock } from './viewUtils.js';
 
-const render = async (state, i18next) => {
+const render = (state, i18next) => {
   const urlInput = document.querySelector('#url-input');
   const button = document.querySelector('button[type="submit"]');
   const feedback = document.querySelector('.feedback');
@@ -31,8 +32,8 @@ const render = async (state, i18next) => {
     feedback.textContent = i18next.t(ERROR_MESSAGES[ERROR_CODES.SUCCESS]);
     feedback.classList.add('text-success');
 
-    feeds.innerHTML = '';
-    posts.innerHTML = '';
+    // feeds.innerHTML = '';
+    // posts.innerHTML = '';
 
     feedsBlock(state, feeds);
     postsBlock(state, posts);
@@ -55,4 +56,11 @@ const render = async (state, i18next) => {
   }
 };
 
-export default render;
+const watcher = (state, i18next) => {
+  const watchedState = onChange(state, () => {
+    render(state, i18next);
+  });
+  return watchedState;
+};
+
+export default watcher;
