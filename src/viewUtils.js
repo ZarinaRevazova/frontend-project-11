@@ -48,8 +48,8 @@ const postsBlock = (state, posts) => {
   ul.classList.add('list-group', 'border-0', 'rounded-0');
 
   divBorder.appendChild(divBody);
-  divBody.appendChild(h2);
   divBorder.appendChild(ul);
+  divBody.appendChild(h2);
 
   h2.textContent = 'Посты';
 
@@ -57,13 +57,27 @@ const postsBlock = (state, posts) => {
     const {
       feedId, link, title, description,
     } = post;
+
+    if (!title || !link) {
+      return;
+    }
     const li = document.createElement('li');
     const a = document.createElement('a');
     const button = document.createElement('button');
 
     // list-group-item d-flex justify-content-between align-items-start border-0 border-end-0
-    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+    li.classList.add(
+      'list-group-item',
+      'd-flex',
+      'justify-content-between',
+      'align-items-start',
+      'border-0',
+      'border-end-0',
+    );
     // href="http://example.com/test/1769299200" class="fw-bold" data-id="2" target="_blank" rel="noopener noreferrer"
+    ul.appendChild(li);
+    li.appendChild(a);
+    li.appendChild(button);
 
     a.classList.add('fw-bold');
     a.href = link;
@@ -78,10 +92,6 @@ const postsBlock = (state, posts) => {
     button.dataset.id = feedId;
     button.dataset.bsToggle = 'modal';
     button.dataset.bsTarget = '#modal';
-
-    ul.appendChild(li);
-    li.appendChild(a);
-    li.appendChild(button);
 
     a.textContent = title;
     button.textContent = 'Просмотр';

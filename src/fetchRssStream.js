@@ -7,46 +7,35 @@ import parseRssString from './parser.js';
 // (тогда поток скачивается без CORS-ограничений) ===>
 // Получаем JSON-объект, где xml-строка хранится в contents (в  data.contents) ===>
 // Эта xml-строка и будет потом входным параметром нашей парсинг-функции
-export const fetchRssFeed = async (rssUrl, state, errorCode, timeout = 5000) => {
+export const fetchRssFeed = async (rssUrl, timeout = 5000) => {
   try {
     const response = await axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(rssUrl)}`, {
       timeout,
     });
 
     if (response.status !== 200) {
-      state.stateProcess = {
-        ...state.stateProcess,
-        process: 'error',
-        errorCode: errorCode.NETWORK_ERROR,
-      };
-      throw new Error(`Прокси вернул HTTP ${response.status}`);
+      throw new Error('NETWORK_ERROR');
     }
 
     const { contents } = response.data;
 
     if (!contents) {
-      state.stateProcess = {
-        ...state.stateProcess,
-        process: 'error',
-        errorCode: errorCode.INVALID_RSS,
-      };
-      throw new Error('Ошибка: пустой RSS-поток');
+      throw new Error('INVALID_RSS');
     }
     return contents;
   } catch (error) {
-    state.stateProcess = {
-      ...state.stateProcess,
-      process: 'error',
-      errorCode: error.message.includes('HTTP') ? errorCode.NETWORK_ERROR : errorCode.INVALID_RSS,
-    };
+    if (error.isAxiosError) {
+      throw new Error('NETWORK_ERROR');
+    }
+
     // console.error('fetchRssFeed ошибка:', error.message);
     throw error;
   }
 };
-export const updateFeeds = (state, errorCode) => {
-  const existingFeedsPromises = state.feeds.map((feed) => fetchRssFeed(feed.link, state, errorCode)
+export const updateFeeds = (state) => {
+  const existingFeedsPromises = state.feeds.map((feed) => fetchRssFeed(feed.link)
     .then((xmlString) => {
-      const { postContent } = parseRssString(xmlString, state, errorCode);
+      const { postContent } = parseRssString(xmlString);
       const newPosts = postContent.map((post) => ({
         id: uniqid(),
         feedId: feed.id,
@@ -60,12 +49,14 @@ export const updateFeeds = (state, errorCode) => {
       }
     })
     .catch((error) => {
-      console.error('updateFeeds ошибка:', error);
+      console.warn('updateFeeds ошибка:', error.message);
+      // console.error('fetchRssFeed ошибка:', error.message);
+      throw error;
     }));
 
-  Promise.all(existingFeedsPromises).then(() => {
+  Promise.all(existingFeedsPromises).finally(() => {
     setTimeout(() => {
-      updateFeeds(state, errorCode);
+      updateFeeds(state);
     }, 5000);
   });
 };

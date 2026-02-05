@@ -9,7 +9,7 @@ const state = {
   // trackedFeeds: [], // новые: список { url, lastCheckTime, lastPostCount }
   // isUpdatingFeeds: false,
   stateProcess: {
-    process: 'processing', // 'processing', 'success', 'error'
+    process: '', // 'processing', 'success', 'error'
     errorCode: null, // ERROR_CODES
   },
   feeds: [], // { id, link, feedTitle, feedDescription }

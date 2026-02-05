@@ -63,23 +63,19 @@ const app = async () => {
       if (!valid) {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = code; // если url не валиден
-        return;
+        throw new Error('INVALID_URL');
       }
       if (watcherState.savedURLs.includes(currentURL)) {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = ERROR_CODES.DUPLICATE_URL; // если url дублируется
         // await render(state, i18nextInstance);
-        return;
+        throw new Error('DUPLICATE_URL');
       }
       // скачиваю поток
-      const xmlString = await fetchRssFeed(currentURL, watcherState, ERROR_CODES);
+      const xmlString = await fetchRssFeed(currentURL);
       // парсю полученные данные в объекте
       // eslint-disable-next-line max-len
-      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString, watcherState, ERROR_CODES);
-
-      if (!feedTitle || !postContent.length) { // Базовая проверка на валидность RSS
-        throw new Error('Invalid RSS');
-      }
+      const { feedTitle, feedDescription, postContent } = parseRssString(xmlString);
 
       // проверяю наличие фидов в состоянии
       const existingFeed = watcherState.feeds.find((feed) => feed.link === currentURL);
@@ -108,13 +104,15 @@ const app = async () => {
 
       // await updateFeeds(state, ERROR_CODES);
     } catch (error) {
-      if (error.message === 'Invalid RSS') {
+      console.error('Ошибка в обработке RSS:', error.message);
+      if (error.message === 'INVALID_RSS') {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = ERROR_CODES.INVALID_RSS;
-      } else {
+      } else if (error.message === 'NETWORK_ERROR') {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = ERROR_CODES.NETWORK_ERROR;
       }
+      // all errors are handled above
     }
     // отображаю состояние
     // очищаю инпут, ставлю фокус
@@ -123,7 +121,7 @@ const app = async () => {
     urlInput.value = '';
     urlInput.focus();
   });
-  updateFeeds(watcherState, ERROR_CODES);
+  updateFeeds(watcherState);
   // await render(state, i18nextInstance);
 };
 
