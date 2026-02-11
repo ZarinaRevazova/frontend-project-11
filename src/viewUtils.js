@@ -55,7 +55,7 @@ const postsBlock = (state, posts) => {
 
   state.posts.forEach((post) => {
     const {
-      feedId, link, title, description,
+      id, link, title,
     } = post;
 
     if (!title || !link) {
@@ -81,7 +81,7 @@ const postsBlock = (state, posts) => {
 
     a.classList.add('fw-bold');
     a.href = link;
-    a.dataset.id = feedId;
+    a.dataset.id = id;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
 
@@ -89,15 +89,51 @@ const postsBlock = (state, posts) => {
     // type="button" class="btn btn-outline-primary btn-sm" data-id="2" data-bs-toggle="modal" data-bs-target="#modal"
     button.type = 'button';
     button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-    button.dataset.id = feedId;
+    button.dataset.id = id;
     button.dataset.bsToggle = 'modal';
     button.dataset.bsTarget = '#modal';
 
     a.textContent = title;
     button.textContent = 'Просмотр';
   });
-
   posts.appendChild(divBorder);
 };
 
-export { feedsBlock, postsBlock };
+const modalBlock = (state, modalId) => {
+  const divModal = document.querySelector('#modal');
+  const modalTitle = document.querySelector('.modal-title');
+  const modalBody = document.querySelector('.modal-body');
+
+  modalTitle.textContent = '';
+  modalBody.textContent = '';
+
+  divModal.removeAttribute('aria-hidden');
+  divModal.setAttribute('aria-modal', 'true');
+  divModal.setAttribute('style', 'display: block;');
+  divModal.classList.add('show');
+
+  state.posts.forEach((post) => {
+    const {
+      id, title, description,
+    } = post;
+    if (id === modalId) {
+      modalTitle.textContent = title;
+      modalBody.textContent = description;
+    }
+  });
+};
+
+const updateReadedLinks = (state) => {
+  state.posts.forEach((post) => {
+    const { id, link } = post;
+    const linkElement = document.querySelector(`a[href="${link}"]`);
+    if (state.uiState.visitedLinks.has(id)) {
+      linkElement.classList.remove('fw-bold');
+      linkElement.classList.add('fw-normal');
+    }
+  });
+};
+
+export {
+  feedsBlock, postsBlock, modalBlock, updateReadedLinks,
+};

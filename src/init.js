@@ -47,6 +47,7 @@ const app = async () => {
   const urlInput = document.querySelector('#url-input');
   // const button = document.querySelector('button[type="submit"]');
   // const feedback = document.querySelector('.feedback');
+  const postsClick = document.querySelector('.posts');
 
   // обработчик
   form.addEventListener('submit', async (event) => {
@@ -121,6 +122,25 @@ const app = async () => {
     urlInput.value = '';
     urlInput.focus();
   });
+
+  postsClick.addEventListener('click', (event) => {
+    event.preventDefault();
+    const targetElement = event.target;
+    const postId = targetElement.dataset.id;
+    // const button = targetElement.closest('button');
+
+    watcherState.uiState.visitedLinks.add(postId);
+
+    if (targetElement.tagName === 'BUTTON') {
+      watcherState.uiState.modalId = postId;
+    }
+  });
+
+  /* const closedCross = document.querySelector('.btn-close');
+  closedCross.addEventListener('click', async () => {
+    watcherState.uiState.modalId = '';
+  }); */
+
   updateFeeds(watcherState);
   // await render(state, i18nextInstance);
 };

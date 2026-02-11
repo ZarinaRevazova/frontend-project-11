@@ -14,6 +14,10 @@ const state = {
   },
   feeds: [], // { id, link, feedTitle, feedDescription }
   posts: [], // { id, feedId, title, link, description }
+  uiState: {
+    visitedLinks: new Set(),
+    modalId: '',
+  },
 };
 
 // функции-конструкторы для дальнейшего добавления данных в состояние фидов и постов
