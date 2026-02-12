@@ -103,6 +103,7 @@ const modalBlock = (state, modalId) => {
   const divModal = document.querySelector('#modal');
   const modalTitle = document.querySelector('.modal-title');
   const modalBody = document.querySelector('.modal-body');
+  // const fullArticle = document.querySelector('.full-article');
 
   modalTitle.textContent = '';
   modalBody.textContent = '';
@@ -121,16 +122,20 @@ const modalBlock = (state, modalId) => {
       modalBody.textContent = description;
     }
   });
+
+  // fullArticle.href = state.posts.find((post) => post.id === modalId).link;
 };
 
 const updateReadedLinks = (state) => {
   state.posts.forEach((post) => {
+    const fullArticle = document.querySelector('.full-article');
     const { id, link } = post;
     const linkElement = document.querySelector(`a[href="${link}"]`);
     if (state.uiState.visitedLinks.has(id)) {
       linkElement.classList.remove('fw-bold');
-      linkElement.classList.add('fw-normal');
+      linkElement.classList.add('fw-normal', 'link-secondary');
     }
+    fullArticle.href = link;
   });
 };
 

@@ -124,7 +124,7 @@ const app = async () => {
   });
 
   postsClick.addEventListener('click', (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     const targetElement = event.target;
     const postId = targetElement.dataset.id;
     // const button = targetElement.closest('button');

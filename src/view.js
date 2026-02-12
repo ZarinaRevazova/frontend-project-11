@@ -71,13 +71,17 @@ const renderPosts = (state) => {
 const renderModalWindow = (state) => {
   const currentId = state.uiState.modalId;
 
-  if (currentId !== '') {
+  if (currentId !== '' || state.uiState.visitedLinks.has(currentId)) {
     const readedLink = document.querySelector(`a[data-id="${currentId}"]`);
     readedLink.classList.remove('fw-bold');
-    readedLink.classList.add('fw-normal');
+    readedLink.classList.add('fw-normal', 'link-secondary');
   }
   modalBlock(state, currentId);
 };
+
+/* const renderReadedLinks = (state) => {
+  updateReadedLinks(state);
+}; */
 
 const watcher = (state, i18next) => {
   const watchedState = onChange(state, (path, value) => {
@@ -96,6 +100,9 @@ const watcher = (state, i18next) => {
         break;
       case 'uiState.modalId':
         renderModalWindow(state);
+        break;
+      case 'uiState.visitedLinks':
+        renderPosts(state);
         break;
       default:
         break;
