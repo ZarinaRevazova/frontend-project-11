@@ -1,6 +1,5 @@
 import onChange from 'on-change';
 import { ERROR_CODES, ERROR_MESSAGES } from './errors.js';
-// import watcherState from './state.js';
 import {
   feedsBlock, postsBlock, modalBlock, updateReadedLinks,
 } from './viewUtils.js';
@@ -25,18 +24,12 @@ const render = (state, value, i18next) => {
   const button = document.querySelector('button[type="submit"]');
   const feedback = document.querySelector('.feedback');
 
-  // обновляю в состоянии url
   if (state.url !== undefined) {
     urlInput.value = state.url;
   }
 
-  // очищаю инпут и поле feedback
   urlInput.classList.remove('is-valid', 'is-invalid');
-  // feedback.textContent = '';
   feedback.classList.remove('text-danger', 'text-success');
-
-  // явно выделяю состояние и в зависимости от него меняется отображение (инпут(границы),
-  // кнопка и фидбек с изменением цвета шрифта)
 
   if (value === 'success') {
     button.disabled = false;
@@ -48,8 +41,6 @@ const render = (state, value, i18next) => {
   } else if (value === 'error') {
     button.disabled = false;
     urlInput.classList.add('is-invalid');
-    // feedback.classList.add('text-danger');
-    // в зависимости от значения ошибки (errorCode в состоянии), выводим соответствующее сообщение
     renderErrors(state, i18next);
   } else {
     button.disabled = true;
@@ -78,10 +69,6 @@ const renderModalWindow = (state) => {
   }
   modalBlock(state, currentId);
 };
-
-/* const renderReadedLinks = (state) => {
-  updateReadedLinks(state);
-}; */
 
 const watcher = (state, i18next) => {
   const watchedState = onChange(state, (path, value) => {

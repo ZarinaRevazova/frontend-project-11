@@ -1,33 +1,24 @@
 import uniqid from 'uniqid';
-// import i18next from 'i18next';
-// import render from './view.js';
 
-// определяю начальное состояние
 const state = {
   url: '',
-  savedURLs: [], // нужно для проверки дубликатов
-  // trackedFeeds: [], // новые: список { url, lastCheckTime, lastPostCount }
-  // isUpdatingFeeds: false,
+  savedURLs: [],
   stateProcess: {
-    process: '', // 'processing', 'success', 'error'
-    errorCode: null, // ERROR_CODES
+    process: '',
+    errorCode: null,
   },
-  feeds: [], // { id, link, feedTitle, feedDescription }
-  posts: [], // { id, feedId, title, link, description }
+  feeds: [],
+  posts: [],
   uiState: {
     visitedLinks: new Set(),
     modalId: '',
   },
 };
-
-// функции-конструкторы для дальнейшего добавления данных в состояние фидов и постов
-// используем id для соединения сущностей feeds и posts
 export const createFeedsState = (url, feedTitle, feedDescription) => ({
   id: uniqid(),
   link: url,
   title: feedTitle,
   description: feedDescription,
-  // posts: [],
 });
 
 export const createPostsState = (feedId, title, link, description) => ({
@@ -37,7 +28,5 @@ export const createPostsState = (feedId, title, link, description) => ({
   link,
   description,
 });
-// создаю вотчер на объект state --> далее в input.js отработаю логику:
-// "меняется состояние --> вотчер отслеживает --> автоматически меняется отображение"
 
 export default state;

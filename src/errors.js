@@ -3,7 +3,7 @@ export const ERROR_CODES = {
   DUPLICATE_URL: 2,
   INVALID_RSS: 3,
   NETWORK_ERROR: 4,
-  SUCCESS: 0, // if valid
+  SUCCESS: 0,
 };
 
 export const ERROR_MESSAGES = {

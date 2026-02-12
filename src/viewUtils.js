@@ -65,7 +65,6 @@ const postsBlock = (state, posts) => {
     const a = document.createElement('a');
     const button = document.createElement('button');
 
-    // list-group-item d-flex justify-content-between align-items-start border-0 border-end-0
     li.classList.add(
       'list-group-item',
       'd-flex',
@@ -74,7 +73,6 @@ const postsBlock = (state, posts) => {
       'border-0',
       'border-end-0',
     );
-    // href="http://example.com/test/1769299200" class="fw-bold" data-id="2" target="_blank" rel="noopener noreferrer"
     ul.appendChild(li);
     li.appendChild(a);
     li.appendChild(button);
@@ -85,8 +83,6 @@ const postsBlock = (state, posts) => {
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
 
-    // eslint-disable-next-line max-len
-    // type="button" class="btn btn-outline-primary btn-sm" data-id="2" data-bs-toggle="modal" data-bs-target="#modal"
     button.type = 'button';
     button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     button.dataset.id = id;
@@ -103,7 +99,6 @@ const modalBlock = (state, modalId) => {
   const divModal = document.querySelector('#modal');
   const modalTitle = document.querySelector('.modal-title');
   const modalBody = document.querySelector('.modal-body');
-  // const fullArticle = document.querySelector('.full-article');
 
   modalTitle.textContent = '';
   modalBody.textContent = '';
@@ -122,8 +117,6 @@ const modalBlock = (state, modalId) => {
       modalBody.textContent = description;
     }
   });
-
-  // fullArticle.href = state.posts.find((post) => post.id === modalId).link;
 };
 
 const updateReadedLinks = (state) => {
