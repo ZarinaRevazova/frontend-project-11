@@ -35,10 +35,7 @@ export default [
     plugins: { import: importPlugin },
     settings: {
       'import/resolver': {
-        node: {
-          extensions: ['.js', '.mjs'],
-          moduleDirectory: ['node_modules', 'src'],
-        },
+        node: {},
       },
     },
     rules: {
@@ -64,7 +61,7 @@ export default [
       'import/no-named-as-default-member': 'off',
       'no-console': 'off',
       'import/no-extraneous-dependencies': 'off',
-      // 'import/no-unresolved': ['warn', { ignore: ['on-change'] }],
+      'import/no-unresolved': ['warn', { ignore: ['on-change'] }],
     },
   },
 ];
