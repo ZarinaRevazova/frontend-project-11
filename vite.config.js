@@ -6,6 +6,11 @@ export default defineConfig({
   server: {
     port: 8080,
   },
+  build: {
+    rollupOptions: {
+      external: ['uniqid'],
+    },
+  },
   resolve: {
     alias: {
       '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
