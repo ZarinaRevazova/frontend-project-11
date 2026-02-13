@@ -8,4 +8,4 @@ lint:
 	npx eslint .
 
 build:
-	vite build  
+	npm run build  

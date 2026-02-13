@@ -41,6 +41,7 @@ jobs:
         # Install and build project
         run: |
           make install
+          export PATH="$PATH:$(pwd)/node_modules/.bin"
           make build
         # Add environment variables
         env:
