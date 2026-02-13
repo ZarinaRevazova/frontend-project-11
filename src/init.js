@@ -66,7 +66,12 @@ const app = async () => {
         watcherState.posts = [createPostsState(currentFeed.id), ...watcherState.posts];
       }
 
-      const newPosts = postContent.map((post) => createPostsState(currentFeed.id, post.title, post.link, post.description));
+      const newPosts = postContent.map((post) => createPostsState(
+        currentFeed.id,
+        post.title,
+        post.link,
+        post.description,
+      ));
       watcherState.posts = [...watcherState.posts, ...newPosts];
 
       watcherState.savedURLs.push(currentURL);

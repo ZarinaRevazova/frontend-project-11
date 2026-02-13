@@ -1,6 +1,7 @@
 import axios from 'axios';
 import uniqid from 'uniqid';
 import parseRssString from './parser.js';
+import { updateState } from './view.js';
 
 export const fetchRssFeed = async (rssUrl, timeout = 5000) => {
   try {
@@ -37,7 +38,9 @@ export const updateFeeds = (state) => {
       const existingPostsURLs = new Set(state.posts.map((post) => post.link));
       const postsToAdd = newPosts.filter((post) => !existingPostsURLs.has(post.link));
       if (postsToAdd.length > 0) {
-        state.posts = [...postsToAdd, ...state.posts];
+        updateState(state, {
+          posts: [...postsToAdd, ...state.posts],
+        });
       }
     })
     .catch((error) => {

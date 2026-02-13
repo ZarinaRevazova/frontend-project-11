@@ -70,6 +70,9 @@ const renderModalWindow = (state) => {
   modalBlock(state, currentId);
 };
 
+export const updateState = (state, patch) => {
+  Object.assign(state, patch);
+};
 const watcher = (state, i18next) => {
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
