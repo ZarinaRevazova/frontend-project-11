@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import path from 'node:path';
 
 export default defineConfig({
-  base: '/',
   root: path.resolve(__dirname, 'dist'),
   server: {
     port: 8080,
