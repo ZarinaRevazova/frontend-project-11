@@ -15,6 +15,9 @@ const schema = yup.object().shape({
 });
 
 const validateURL = async (url) => {
+  if (!url || url.trim() === '') {
+    throw new Error('EMPTY_URL');
+  }
   try {
     await schema.validate({ website: url });
     return { valid: true, code: ERROR_CODES.SUCCESS };
@@ -39,8 +42,7 @@ const app = async () => {
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const currentURL = urlInput.value.trim();
-    watcherState.url = currentURL;
+    const currentURL = new FormData(event.target).get('url');
 
     try {
       const { valid, code } = await validateURL(currentURL);
@@ -82,6 +84,9 @@ const app = async () => {
       if (error.message === 'INVALID_RSS') {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = ERROR_CODES.INVALID_RSS;
+      } else if (error.message === 'EMPTY_URL') {
+        watcherState.stateProcess.process = 'error';
+        watcherState.stateProcess.errorCode = ERROR_CODES.EMPTY_URL;
       } else if (error.message === 'NETWORK_ERROR') {
         watcherState.stateProcess.process = 'error';
         watcherState.stateProcess.errorCode = ERROR_CODES.NETWORK_ERROR;

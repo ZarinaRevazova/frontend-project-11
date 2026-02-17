@@ -1,7 +1,6 @@
 import uniqid from 'uniqid';
 
 const state = {
-  url: '',
   savedURLs: [],
   stateProcess: {
     process: '',

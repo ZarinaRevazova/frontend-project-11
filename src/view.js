@@ -19,6 +19,7 @@ const renderErrors = (state, i18next) => {
     feedback.classList.remove('text-danger');
   }
 };
+
 const render = (state, value, i18next) => {
   const urlInput = document.querySelector('#url-input');
   const button = document.querySelector('button[type="submit"]');
