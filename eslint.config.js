@@ -26,8 +26,6 @@ export default [
         ...globals.browser,
       },
       parserOptions: {
-        // Eslint doesn't supply ecmaVersion in `parser.js` `context.parserOptions`
-        // This is required to avoid ecmaVersion < 2015 error or 'import' / 'export' error
         ecmaVersion: 'latest',
         sourceType: 'module',
       },
@@ -61,7 +59,7 @@ export default [
       'import/no-named-as-default-member': 'off',
       'no-console': 'off',
       'import/no-extraneous-dependencies': 'off',
-      // 'import/no-unresolved': ['warn', { ignore: ['on-change'] }],
+      'import/no-unresolved': ['warn', { ignore: ['on-change'] }],
     },
   },
 ];
