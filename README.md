@@ -53,4 +53,5 @@ Launching:
 #
 ### SonarQube
 [![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=ZarinaRevazova_frontend-project-11)
+
 #
