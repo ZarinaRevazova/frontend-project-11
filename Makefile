@@ -9,3 +9,6 @@ lint:
 
 build:
 	npm run build  
+
+test:
+	npx playwright test
